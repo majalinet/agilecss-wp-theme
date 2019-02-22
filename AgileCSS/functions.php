@@ -26,6 +26,32 @@ register_nav_menus( [
 	'footer_menu_right' => esc_html__( 'Footer Menu Right', 'agilecss'),
 ] );
 
+//Init Widgets Area
+function AgileWidtgets_init(){
+	register_sidebar([
+		'name'          => 'Main advanteges',
+		'id'            => 'index',
+		'description'   => esc_html__( 'Add widgets for main page', 'agilecss' ),
+		'before_widget' => '<div class="col-md-4">',
+		'after_widget'  => '</div>',
+	]);
+	
+}
+add_action( 'widgets_init', 'AgileWidtgets_init' );
 
+// Customizing WP structure to Agile structure
+function agille_customize_content($content){
+	if( !in_the_loop() ){
+		return;
+	}
+	
+	return preg_replace_callback_array ( [
+		// customizing quote structure
+		"~(.*?)<cite.*?>(.*?)<\/cite>(.*?)~is" => function( &$matches ){
+			return $matches[1] . '<footer class="blockquote-footer">' . $matches[2] ."</footer>". $matches[3];
+		}
+	], $content );
+}
+add_filter( 'the_content', 'agille_customize_content', 10);
 
 ?>
