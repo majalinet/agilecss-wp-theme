@@ -14,9 +14,9 @@
 	
 ?>
 <?php if( !empty($thumbnail_url) ){?>
-<div class="col-md-4 m-v-2">
-	<img src="<?php echo $thumbnail_url; ?>" class="img-responsive">
-</div>
+	<div class="col-md-4 m-v-2">
+		<img src="<?php echo $thumbnail_url; ?>" class="img-responsive">
+	</div>
 <?php }?>
 <?php if( !empty($thumbnail_url) ){?>
 	<div class="col-md-8  m-v-2">
@@ -24,7 +24,7 @@
 	<div class="col-md-12  m-v-2">
 <?php };?>
 	<h2 class="h4 dark"><?php the_title();?></h2>
-	<p><?php get_avatar( get_the_author_meta( 'ID' ), 32); ?>
+	<p><?php echo get_avatar( get_the_author_meta( 'ID' ), 32, '', '', array( 'class' => 'circle icon-s' ) ); ?>
 		<span class="badge">
 			<?php get_the_author_meta( 'display_name' )?esc_html_e(get_the_author_meta( 'display_name' )):esc_html_e(get_the_author_meta( 'login' )); ?> wrote on
 			<?php the_time('d/m/Y');?>
