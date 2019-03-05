@@ -1,8 +1,8 @@
 <?php 
-// Add Thema Support
+// Add Theame Support
 add_theme_support( 'title-tag' );
 add_theme_support( 'post-thumbnails' );
-add_theme_support( 'post-format', ['aside', 'gallery', 'link', 'image', 'quote', 'status', 'video', 'audio', 'chat']);
+add_theme_support( 'post-formats', ['aside', 'gallery', 'link', 'image', 'quote', 'status', 'video', 'audio', 'chat' ]);
 add_theme_support( 'html5' );
 add_theme_support( 'automatic-feed-links' );
 add_theme_support( 'custom-backgroud' );
@@ -15,9 +15,24 @@ add_theme_support( 'starter-content' );
  */
 function agilecss_scripts() {
 	wp_enqueue_style( 'agilecss-style', get_template_directory_uri() . '/style.css', array(), time(), 'all');
-
 }
 add_action( 'wp_enqueue_scripts', 'agilecss_scripts' );
+
+function my_admin_scripts() {  
+    wp_enqueue_script('media-upload');  
+    wp_enqueue_script('thickbox');  
+	wp_enqueue_style('thickbox.css', '/'.WPINC.'/js/thickbox/thickbox.css', null, '1.0');
+    wp_register_script(  
+                'my-upload-script',              
+                get_bloginfo('template_url') . '/js/upload.js',                
+                array('jquery', 'media-upload', 'thickbox')  
+    );  
+    wp_enqueue_script('my-upload-script');
+	wp_enqueue_style( 'agilecss-admin-style', get_bloginfo('template_url') . '/css/style.css', array(), time(), 'all');	
+}  
+if( is_admin() )  
+add_action('admin_print_scripts', 'my_admin_scripts');  
+
 
 //Register Menu Locations
 register_nav_menus( [
@@ -26,32 +41,15 @@ register_nav_menus( [
 	'footer_menu_right' => esc_html__( 'Footer Menu Right', 'agilecss'),
 ] );
 
-//Init Widgets Area
-function AgileWidtgets_init(){
-	register_sidebar([
-		'name'          => 'Main advanteges',
-		'id'            => 'index',
-		'description'   => esc_html__( 'Add widgets for main page', 'agilecss' ),
-		'before_widget' => '<div class="col-md-4">',
-		'after_widget'  => '</div>',
-	]);
-	
-}
-add_action( 'widgets_init', 'AgileWidtgets_init' );
+/*ACTIONS*/
+	require get_template_directory() . '/inc/actions-functions.php';
+/*END ACTIONS*/
 
-// Customizing WP structure to Agile structure
-function agille_customize_content($content){
-	if( !in_the_loop() ){
-		return;
-	}
-	
-	return preg_replace_callback_array ( [
-		// customizing quote structure
-		"~(.*?)<cite.*?>(.*?)<\/cite>(.*?)~is" => function( &$matches ){
-			return $matches[1] . '<footer class="blockquote-footer">' . $matches[2] ."</footer>". $matches[3];
-		}
-	], $content );
-}
-add_filter( 'the_content', 'agille_customize_content', 10);
+/*FILTERS*/
+	require get_template_directory() . '/inc/filters-functions.php';
+/*END FILTERS*/
 
+/*OTHER FUNCTIONS*/
+	require get_template_directory() . '/inc/custom-functions.php';
+/*END OTHER FUNCTIONS*/
 ?>

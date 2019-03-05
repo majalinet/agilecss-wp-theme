@@ -4,7 +4,14 @@ get_header();
 
 	<section id="primary" class="content-area">
 		<main id="main" class="site-main">
-
+		<?php if( !is_front_page() ){	?>
+			<header class="promo-box-s bg-light-grey">
+			  <div class="container">
+				<h1 class=""><?php wp_title(''); ?></h1>
+				<?php custom_breadcrumbs();?>
+			  </div>
+			</header>
+		<?php } ?>
 		<?php
 		if ( have_posts() ) {
 			
