@@ -15,6 +15,7 @@ add_theme_support( 'starter-content' );
  */
 function agilecss_scripts() {
 	wp_enqueue_style( 'agilecss-style', get_template_directory_uri() . '/style.css', array(), time(), 'all');
+	wp_enqueue_style( 'agilecss-custom-style', get_template_directory_uri() . '/custom.css', array('agilecss-style'), time(), 'all');
 }
 add_action( 'wp_enqueue_scripts', 'agilecss_scripts' );
 
@@ -48,6 +49,10 @@ register_nav_menus( [
 /*FILTERS*/
 	require get_template_directory() . '/inc/filters-functions.php';
 /*END FILTERS*/
+
+/*CLASSES*/
+	require get_template_directory() . '/classes/class-agile-walker-comment.php';
+/*END CLASSES*/
 
 /*OTHER FUNCTIONS*/
 	require get_template_directory() . '/inc/custom-functions.php';

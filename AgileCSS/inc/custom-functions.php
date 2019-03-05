@@ -1,4 +1,34 @@
 <?php
+//Get the Attachment ID from an Image URL
+function pn_get_attachment_id_from_url( $attachment_url = '' ) {
+ 
+	global $wpdb;
+	$attachment_id = false;
+ 
+	// If there is no url, return.
+	if ( '' == $attachment_url )
+		return;
+ 
+	// Get the upload directory paths
+	$upload_dir_paths = wp_upload_dir();
+ 
+	// Make sure the upload path base directory exists in the attachment URL, to verify that we're working with a media library image
+	if ( false !== strpos( $attachment_url, $upload_dir_paths['baseurl'] ) ) {
+ 
+		// If this is the URL of an auto-generated thumbnail, get the URL of the original image
+		$attachment_url = preg_replace( '/-\d+x\d+(?=\.(jpg|jpeg|png|gif)$)/i', '', $attachment_url );
+ 
+		// Remove the upload path base directory from the attachment URL
+		$attachment_url = str_replace( $upload_dir_paths['baseurl'] . '/', '', $attachment_url );
+ 
+		// Finally, run a custom database query to get the attachment ID from the modified attachment URL
+		$attachment_id = $wpdb->get_var( $wpdb->prepare( "SELECT wposts.ID FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta WHERE wposts.ID = wpostmeta.post_id AND wpostmeta.meta_key = '_wp_attached_file' AND wpostmeta.meta_value = '%s' AND wposts.post_type = 'attachment'", $attachment_url ) );
+ 
+	}
+ 
+	return $attachment_id;
+}
+
 //Page navigation bar
 function agile_navi() {
 	global $wp_query;
@@ -289,7 +319,7 @@ function extra_fields_box_func( $post ){?>
 					<input type="text" name="signature-name" value="<?php echo get_post_meta($post->ID, 'signature_name', 1); ?>" style="width:100%" /> 
 				</p>
 				<p>Signature text (description):
-					<textarea type="text" name="signature-text" style="width:100%;height:50px;"><?php echo get_post_meta($post->ID, 'signature_description', 1); ?></textarea>
+					<textarea name="signature-text" style="width:100%;height:50px;"><?php echo get_post_meta($post->ID, 'signature_description', 1); ?></textarea>
 				</p>
 			</div>
 		</div>
@@ -299,4 +329,177 @@ function extra_fields_box_func( $post ){?>
 	<?php
 }
 
+function portfolio_fields_box_func( $post ){
+?>
+	<?php  $slider = get_post_meta($post->ID, 'slider', 1);?>
+	<div class="slider title" style="border-bottom:1px solid #e2e4e7">
+		<span class="toggle-indicator" aria-hidden="true"></span>
+		<h3 id="slider-title">Slider images</h3>
+		<div class="slider <?php if( $slider == 'N' ){?>hidden<?php }?>" >
+			<input type="hidden" id="slider" name="slider" value="<?php if( $slider != 'N' ){ echo $slider; }else{?>N<?php }?>">
+			<?php $sliderImgs = get_post_meta( $post->ID, 'slider_image', false);?>
+			<div id="slider_images">
+			<?php if( $sliderImgs ){?>
+				<?php foreach( $sliderImgs[0] as $i=>$img ){?>
+					<p>							
+						<img src="<?php echo $img; ?>" id="slider-image" class="slider-img" <?php if( !$img ){?>class="hidden"<?php }?>>
+						<input type="hidden" id="slider-image-field" name="slider-image[]" value="<?php echo $img; ?>">
+						<span class="dashicons dashicons-no" onclick="jQuery(this).parent().remove()"></span>
+					</p>
+				<?php };?>
+			<?php };?>
+			</div>
+			<p><input id="slider-image-button" type="button" class="button" value="Upload" />  </p>
+		</div>
+	</div>
+	
+	<?php  $requiremets = get_post_meta($post->ID, 'requiremets', 1);?>
+	<div class="requiremets title" style="border-bottom:1px solid #e2e4e7">
+		<span class="toggle-indicator" aria-hidden="true"></span>
+		<h3 id="requiremets-title">Project Requirments</h3>
+		<div class="requiremets <?php if( $requiremets == 'N' ){?>hidden<?php }?>" >
+			<input type="hidden" id="requiremets" name="requiremets" value="<?php if( $requiremets != 'N' ){ echo $requiremets; }else{?>N<?php }?>">			
+			<div id="requiremets_container">
+				<p>
+					Title
+					<input type="text" name="requiremets-title" value="<?php echo get_post_meta($post->ID, 'requiremets_title', 1); ?>" style="width:100%" /> 
+				</p>
+				<p>
+					Text
+					<textarea name="requiremets-text" rows="5" style="width:100%" ><?php echo get_post_meta($post->ID, 'requiremets_text', 1); ?></textarea> 
+				</p>
+				<p>
+					Requiremets tags
+					<div id="requiremets_tags_container">
+						<input type="hidden" name="requiremets-tags" value="">
+					
+						<?php $tags = get_post_meta( $post->ID, 'requiremets_tags', false);?>
+						<?php if( !empty($tags) ){
+							foreach( $tags[0] as $tag ){
+								?>
+								<span class="custom-tags">
+									<input type="hidden" name="requiremets-tags[]" value="<?php echo $tag?>">
+									<?php echo $tag?>
+									<span class="dashicons dashicons-no" onclick="jQuery(this).parent().remove()"></span>
+								</span>
+								<?php
+							}
+						}?>
+					</div>
+					<input type="text" id="requiremets-tags" /> 
+					<button class="add_tags" data-field="requiremets-tags" data-target="requiremets_tags_container">Add</button>
+					<p class="howto" id="new-tag-post_tag-desc">Separate tags with commas</p>
+				</p>
+				<p>
+					Requiremets custom fields					
+					<div id="requiremets_custom_fields_container">
+						<input type="hidden" name="requiremets_custom_fields" value="">
+						<?php
+						$custom_fields = get_post_meta($post->ID, 'requiremets_custom_fields', 1);
+						if( !empty($custom_fields) ){
+							foreach( $custom_fields as $key => $array ){
+						?>
+								<p>
+									<input type="text" name="requiremets_custom_fields[<?php echo $key; ?>][name]" value="<?php echo $array['name']; ?>" style="width:20%"/>
+									<input type="text" name="requiremets_custom_fields[<?php echo $key; ?>][value]" value="<?php echo $array['value']; ?>" placeholder="Value" style="width:70%"/>
+									<span class="dashicons dashicons-no" onclick="jQuery(this).parent().remove()"></span>
+									
+								</p>
+							<?php }?>
+						<?php }?>						
+					</div>
+					<?php if( !empty($custom_fields) ){?><p class="howto" id="new-tag-post_tag-desc">Separate value with commas</p><?php }?>
+					<input type="text" id="requiremets_custom_fields" /> 
+					<button class="add_custom_fileds" data-field="requiremets_custom_fields" data-target="requiremets_custom_fields_container">Add</button>
+				</p>
+			</div>
+		</div>
+	</div>
+	
+	<?php  $results = get_post_meta($post->ID, 'results', 1);?>
+	<div class="results title" style="border-bottom:1px solid #e2e4e7">
+		<span class="toggle-indicator" aria-hidden="true"></span>
+		<h3 id="results-title">Project Results</h3>
+		<div class="results <?php if( $results == 'N' ){?>hidden<?php }?>" >
+			<input type="hidden" id="results" name="results" value="<?php if( $results != 'N' ){ echo $results; }else{?>N<?php }?>">			
+			<div id="results_container">
+				<p>
+					Title
+					<input type="text" name="results-title" value="<?php echo get_post_meta($post->ID, 'results_title', 1); ?>" style="width:100%" /> 
+				</p>
+				<p>
+					Text
+					<textarea name="results-text" rows="5" style="width:100%" ><?php echo get_post_meta($post->ID, 'results_text', 1); ?></textarea> 
+				</p>
+				<p>
+					Results tags
+					<div id="results_tags_container">
+						<input type="hidden" name="results-tags" value="">
+					
+						<?php $tags = get_post_meta( $post->ID, 'results_tags', false);?>
+						<?php if( !empty($tags) ){
+							foreach( $tags[0] as $tag ){
+								?>
+								<span class="custom-tags">
+									<input type="hidden" name="results-tags[]" value="<?php echo $tag?>">
+									<?php echo $tag?>
+									<span class="dashicons dashicons-no" onclick="jQuery(this).parent().remove()"></span>
+								</span>
+								<?php
+							}
+						}?>
+					</div>
+					<input type="text" id="results-tags" /> 
+					<button class="add_tags" data-field="results-tags" data-target="results_tags_container">Add</button>
+					<p class="howto" id="new-tag-post_tag-desc">Separate tags with commas</p>
+				</p>
+				<p>
+					Results custom fields					
+					<div id="results_custom_fields_container">
+						<input type="hidden" name="results_custom_fields" value="">
+						<?php
+						$custom_fields = get_post_meta($post->ID, 'results_custom_fields', 1);
+						if( !empty($custom_fields) ){
+							foreach( $custom_fields as $key => $array ){
+						?>
+								<p>
+									<input type="text" name="results_custom_fields[<?php echo $key; ?>][name]" value="<?php echo $array['name']; ?>" style="width:20%"/>
+									<input type="text" placeholder="Value" name="results_custom_fields[<?php echo $key; ?>][value]" value="<?php echo $array['value']; ?>" style="width:70%"/>
+									<span class="dashicons dashicons-no" onclick="jQuery(this).parent().remove()"></span>
+								</p>
+							<?php }?>						
+						<?php }?>						
+					</div>
+					<?php if( !empty($custom_fields) ){?><p class="howto" id="new-tag-post_tag-desc">Separate value with commas</p><?php }?>	
+					<input type="text" id="results_custom_fields" /> 
+					<button class="add_custom_fileds" data-field="results_custom_fields" data-target="results_custom_fields_container">Add</button>
+				</p>
+			</div>
+		</div>
+	</div>	
+	
+	<?php  $gallery = get_post_meta($post->ID, 'gallery', 1);?>
+	<div class="gallery title" style="border-bottom:1px solid #e2e4e7">
+		<span class="toggle-indicator" aria-hidden="true"></span>
+		<h3 id="gallery-title">Gallery images</h3>
+		<div class="gallery <?php if( $gallery == 'N' ){?>hidden<?php }?>" >
+			<input type="hidden" id="gallery" name="gallery" value="<?php if( $gallery != 'N' ){ echo $gallery; }else{?>N<?php }?>">
+			<?php $galleryImgs = get_post_meta( $post->ID, 'gallery_image', false);?>
+			<div id="gallery_images">
+			<?php if( $galleryImgs ){?>
+				<?php foreach( $galleryImgs[0] as $i=>$img ){?>
+					<p>							
+						<img src="<?php echo $img; ?>" id="gallery-image" class="gallery-img" <?php if( !$img ){?>class="hidden"<?php }?>>
+						<input type="hidden" id="gallery-image-field" name="gallery-image[]" value="<?php echo $img; ?>">
+						<span class="dashicons dashicons-no" onclick="jQuery(this).parent().remove()"></span>
+					</p>
+				<?php };?>
+			<?php };?>
+			</div>
+			<p><input id="gallery-image-button" type="button" class="button" value="Upload" />  </p>
+		</div>
+	</div>
+	<input type="hidden" name="extra_field_nonce" value="<?php echo wp_create_nonce(__FILE__); ?>" />
+<?php	
+}
 ?>

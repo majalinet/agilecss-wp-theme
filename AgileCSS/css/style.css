@@ -6,3 +6,28 @@
 	margin: 0 auto;
 	margin-bottom: 10px;
 }
+#gallery_images > p, #slider_images > p {
+	display: inline-block;
+	margin: 5px;
+	position: relative;
+}
+#gallery_images > p > .dashicons, #slider_images > p > .dashicons{
+    position: absolute;
+    top: 0;
+    right: 0;
+	cursor: pointer;
+}
+.gallery-img, .slider-img{
+	max-width: 100px;
+	max-height: 100px;
+}
+.title > h3 {
+	cursor: pointer;
+}
+.title .toggle-indicator{
+	position: absolute;
+    right: 10px;
+}
+.title.close .toggle-indicator:before{
+	content: "\f140" !important;
+}
