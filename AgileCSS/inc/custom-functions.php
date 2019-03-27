@@ -1,4 +1,56 @@
 <?php
+//save custom styles from options
+function save_styles($settings){
+	$file = get_template_directory().'/custom.css';
+	// $settings =  get_option( 'agile_option_name' );
+	
+	if( file_exists( $file ) ){
+		$styles =  file_get_contents( $file );
+		$styleparts = explode('/*##Custom css from options##*/',$styles);
+		$new_styles = $styleparts[0]."/*##Custom css from options##*/";
+		if( $settings['first_color'] || $settings['second_color']){
+			$new_styles .= "\n:root {\n";
+			if( $settings['first_color'] ){
+				$new_styles .= "--color-1: ".$settings['first_color'].";\n";
+			}
+			if( $settings['second_color'] ){
+				$new_styles .= "--color-2: ".$settings['second_color'].";\n";
+			}
+			$new_styles .= "}\n";
+			if( $settings['background_color'] ){				
+				$new_styles .= ".background_color{\n background-color: ".$settings['background_color'].";\n}\n";
+			}
+			if( $settings['header_background_color'] ){				
+				$new_styles .= ".header_background_color{\n background-color: ".$settings['header_background_color'].";\n}\n";
+			}
+			if( $settings['footer_background_color'] ){				
+				$new_styles .= ".footer_background_color{\n background-color: ".$settings['footer_background_color'].";\n}\n";
+			}
+			if( $settings['copyrights_background_color'] ){				
+				$new_styles .= ".copyrights_background_color{\n background-color: ".$settings['copyrights_background_color'].";\n}\n";
+			}
+			
+		}
+		$new_styles .= "/*##Custom css from options##*/".$styleparts[2];
+		file_put_contents($file, $new_styles);
+		
+	}else{
+		$new_styles = "\n/*##Custom css from options##*/\n";
+		if( $settings['first_color'] || $settings['second_color']){
+			$new_styles .= ":root {\n";
+			if( $settings['first_color'] ){
+				$new_styles .= "--color-1: ".$settings['first_color'].";\n";
+			}
+			if( $settings['second_color'] ){
+				$new_styles .= "--color-2: ".$settings['second_color'].";\n";
+			}
+			$new_styles .= "}\n";
+		}
+		$new_styles .= "\n/*##Custom css from options##*/\n";
+		file_put_contents($file, $new_styles);
+	}
+}
+
 //Get the Attachment ID from an Image URL
 function pn_get_attachment_id_from_url( $attachment_url = '' ) {
  

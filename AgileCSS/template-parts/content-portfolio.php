@@ -29,7 +29,7 @@ foreach ( $serv as $tag ) {
 unset( $serv );
 ?>
 
-<div class="container row m-v-4">
+<div class="row m-v-4">
 	<div class="col-md-8">
 		<img src="<?php echo $thumbnail_url; ?>" class="img-responsive">
 	</div>

@@ -1,15 +1,11 @@
+<?php 
+/* 
+Template Name: NO Footer Page 
+Template Post Type: post, page, event, portfolio
+*/ 
+?>
 <?php
 get_header();
-$agile_options = get_option( 'agile_option_name' );
-
-switch($agile_options['layout_type']){
-	case 'booked':
-		$layout_class = 'container';
-		break;
-	default:
-		$layout_class = 'container-fluid';
-		break;
-}
 if ( have_posts() ) {
 	the_post();
 $tags =  wp_get_post_tags( $post->ID );
@@ -55,8 +51,8 @@ $current=$post;
 			<?php custom_breadcrumbs();?>			
 		</div>
 	</div>
-	<main class="<?php _e($layout_class); ?>">
-		<div class="row m-v-4">
+	<main>
+		<div class="container row m-v-4">
             <div class="col-md-8">
                 <img src="<?php echo $thumbnail_url; ?>" class="img-responsive">
             </div>
@@ -87,7 +83,7 @@ $current=$post;
 		$results = get_post_meta($post->ID, 'results', 1);
 		if( !empty($requiremets) || !empty($results) ){
 		?>
-		<div class="row m-v-4">
+		<div class="container row m-v-4">
 			<?php if( !empty($requiremets) ){?>
 				<div class="col-md-6">
 					<h2 class="h4 dark"><?php echo get_post_meta($post->ID, 'requiremets_title', 1); ?></h2>
@@ -205,5 +201,5 @@ $current=$post;
     </main>
 <?php
 }
-get_footer();
+get_footer('empty');
 ?>

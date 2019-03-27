@@ -1,5 +1,14 @@
 <?php
 get_header();
+$agile_options = get_option( 'agile_option_name' );
+switch($agile_options['layout_type']){
+	case 'booked':
+		$layout_class = 'container';
+		break;
+	default:
+		$layout_class = 'container-fluid';
+		break;
+}
 if ( have_posts() ) {
 	the_post();
 $tags =  wp_get_post_tags( $post->ID );
@@ -13,6 +22,9 @@ unset( $tags );
 $thumbnail_url = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'full', true );
 $thumbnail_url = $thumbnail_url[0];
 $current=$post;
+
+
+
 ?>
 	<div class="promo-box-s bg-light-grey">
 		<div class="container">
@@ -30,8 +42,8 @@ $current=$post;
 			</p>
 		</div>
 	</div>
-	<main>
-        <article class="container">
+	<main class="<?php _e($layout_class); ?>">
+        <article>
             <div class=" m-v-2">
                 <img src="<?php echo $thumbnail_url; ?>" class="img-responsive">
             </div>
@@ -42,7 +54,7 @@ $current=$post;
 
 
         </article>
-        <aside class="container">
+        <aside>
                 <p class="m-v-2">
 					<span class="font-weight-400">Aticle Tags: </span>
 					<?php echo $tags_html; ?>

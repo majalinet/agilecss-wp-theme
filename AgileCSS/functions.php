@@ -38,9 +38,22 @@ add_action('admin_print_scripts', 'my_admin_scripts');
 //Register Menu Locations
 register_nav_menus( [
 	'main_menu' => esc_html__( 'Main Menu', 'agilecss'),
-	'footer_menu_left' => esc_html__( 'Footer Menu Left', 'agilecss'),
-	'footer_menu_right' => esc_html__( 'Footer Menu Right', 'agilecss'),
 ] );
+$options = get_option( 'agile_footer_option_name' );
+
+foreach( $options as $key => $option ){
+	if( $option == 'menu' ){
+		$name_key = str_replace('type', 'menu_name', $key);
+		$menus[$name_key] = esc_html__( $options[$name_key], 'agilecss');
+	}
+}
+register_nav_menus( $menus );
+
+/*Add new file sizes*/
+// if ( function_exists( 'add_image_size' ) ) {
+	add_image_size( 'icon', 50, 50, false );
+// }
+/*END Add new file sizes*/
 
 /*ACTIONS*/
 	require get_template_directory() . '/inc/actions-functions.php';
@@ -52,6 +65,7 @@ register_nav_menus( [
 
 /*CLASSES*/
 	require get_template_directory() . '/classes/class-agile-walker-comment.php';
+	require get_template_directory() . '/classes/class-agile-settings-page.php';
 /*END CLASSES*/
 
 /*OTHER FUNCTIONS*/

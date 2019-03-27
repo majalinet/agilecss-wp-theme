@@ -1,3 +1,23 @@
+/*##Custom css from options##*/
+:root {
+--color-1: #0b2ce8;
+--color-2: #81d742;
+}
+/*##Custom css from options##*/
 .bg-color-1 a {
 	color: inherit;
+}
+
+.footer-label-text{
+	margin: 0;
+}
+.toggle-search{
+	display: inline-block !important;
+}
+.search-form{
+	display: none;
+}
+
+.no-margin{
+	margin: 0;
 }

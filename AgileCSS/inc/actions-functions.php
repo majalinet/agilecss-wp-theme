@@ -92,14 +92,28 @@ function my_portfolio_fields_update ( $post_id ){
 		$name = str_replace( '-', '_', $key);
 		$extra_fields[$name] = $field;
 	}
-	foreach( $extra_fields as $key => $value ){              
-		if( empty($value) )  
-			delete_post_meta($post_id, $key);   
-		if($value)  
-			update_post_meta($post_id, $key, $value);  
-    }
+	if( is_array($extra_fields) ){
+		foreach( $extra_fields as $key => $value ){              
+			if( empty($value) )  
+				delete_post_meta($post_id, $key);   
+			if($value)  
+				update_post_meta($post_id, $key, $value);  
+		}
+	}
 }
 add_action( 'save_post', 'my_portfolio_fields_update', 0 );
+
+// Change Classes in main menu
+add_filter( 'nav_menu_css_class', 'filter_nav_menu_css_classes', 10, 4 );
+function filter_nav_menu_css_classes( $classes, $item, $args, $depth ) {
+	if ( $args->theme_location === 'main_menu' ) {
+		$classes = [
+			$args->menu_items_class
+		];
+	}
+	return $classes;
+}
+
 
 // Add fields after default fields above the comment box, always visible
 

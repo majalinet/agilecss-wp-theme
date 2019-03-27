@@ -1,9 +1,18 @@
 <?php
 get_header();
+$agile_options = get_option( 'agile_option_name' );
 
+switch($agile_options['layout_type']){
+	case 'booked':
+		$layout_class = 'container';
+		break;
+	default:
+		$layout_class = 'container-fluid';
+		break;
+}
 ?>
 
-	<section id="primary" class="content-area">
+	<section id="primary" class="<?php _e($layout_class); ?> content-area">
 		<main id="main" class="site-main">
 			<header class="promo-box-s bg-light-grey">
 			  <div class="container">
