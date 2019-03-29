@@ -15,6 +15,7 @@ add_theme_support( 'starter-content' );
  */
 function agilecss_scripts() {
 	wp_enqueue_style( 'agilecss-style', get_template_directory_uri() . '/style.css', array(), time(), 'all');
+	wp_enqueue_style( 'agilecss-custom-style', get_template_directory_uri() . '/custom.css', array('agilecss-style'), time(), 'all');
 }
 add_action( 'wp_enqueue_scripts', 'agilecss_scripts' );
 
@@ -37,9 +38,22 @@ add_action('admin_print_scripts', 'my_admin_scripts');
 //Register Menu Locations
 register_nav_menus( [
 	'main_menu' => esc_html__( 'Main Menu', 'agilecss'),
-	'footer_menu_left' => esc_html__( 'Footer Menu Left', 'agilecss'),
-	'footer_menu_right' => esc_html__( 'Footer Menu Right', 'agilecss'),
 ] );
+$options = get_option( 'agile_footer_option_name' );
+
+foreach( $options as $key => $option ){
+	if( $option == 'menu' ){
+		$name_key = str_replace('type', 'menu_name', $key);
+		$menus[$name_key] = esc_html__( $options[$name_key], 'agilecss');
+	}
+}
+register_nav_menus( $menus );
+
+/*Add new file sizes*/
+// if ( function_exists( 'add_image_size' ) ) {
+	add_image_size( 'icon', 50, 50, false );
+// }
+/*END Add new file sizes*/
 
 /*ACTIONS*/
 	require get_template_directory() . '/inc/actions-functions.php';
@@ -48,6 +62,11 @@ register_nav_menus( [
 /*FILTERS*/
 	require get_template_directory() . '/inc/filters-functions.php';
 /*END FILTERS*/
+
+/*CLASSES*/
+	require get_template_directory() . '/classes/class-agile-walker-comment.php';
+	require get_template_directory() . '/classes/class-agile-settings-page.php';
+/*END CLASSES*/
 
 /*OTHER FUNCTIONS*/
 	require get_template_directory() . '/inc/custom-functions.php';

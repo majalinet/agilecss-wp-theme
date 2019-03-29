@@ -1,5 +1,14 @@
 <?php
 get_header();
+$agile_options = get_option( 'agile_option_name' );
+switch($agile_options['layout_type']){
+	case 'booked':
+		$layout_class = 'container';
+		break;
+	default:
+		$layout_class = 'container-fluid';
+		break;
+}
 if ( have_posts() ) {
 	the_post();
 $tags =  wp_get_post_tags( $post->ID );
@@ -9,9 +18,13 @@ foreach ( $tags as $tag ) {
 	$tags_html .= "<span class='badge outline-color-1'><a href='{$tag_link}' title='{$tag->name}' class='{$tag->slug}'>";
 	$tags_html .= "{$tag->name}</a></span>";
 }
-// unset( $tags );
+unset( $tags );
 $thumbnail_url = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'full', true );
 $thumbnail_url = $thumbnail_url[0];
+$current=$post;
+
+
+
 ?>
 	<div class="promo-box-s bg-light-grey">
 		<div class="container">
@@ -29,8 +42,8 @@ $thumbnail_url = $thumbnail_url[0];
 			</p>
 		</div>
 	</div>
-	<main>
-        <article class="container">
+	<main class="<?php _e($layout_class); ?>">
+        <article>
             <div class=" m-v-2">
                 <img src="<?php echo $thumbnail_url; ?>" class="img-responsive">
             </div>
@@ -41,7 +54,7 @@ $thumbnail_url = $thumbnail_url[0];
 
 
         </article>
-        <aside class="container">
+        <aside>
                 <p class="m-v-2">
 					<span class="font-weight-400">Aticle Tags: </span>
 					<?php echo $tags_html; ?>
@@ -68,62 +81,32 @@ $thumbnail_url = $thumbnail_url[0];
 				<?php };?>
             </div>
 			<?php };?>
-			<?php
-				foreach ( $tags as $tag ) {
-					if( $querytags ){
-						$querytags.=',';
-					}else{
-						$querytags='';
-					}
-					$querytags.=$tag->name;
-				}
-			$related = new WP_Query( array( '!p' => $post->ID, 'tag' =>$querytags ) );?>
-			<?php if ( $related->have_posts() ){ ?>
-				<div class="row">
-					<?php while( $related->have_posts() ){
-						$related->the_post();
-						$thumbnail_url = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), array('220','220'), true );
-						$thumbnail_url = $thumbnail_url[0];
-						?>
-						<div class="col-md-6 row">
-							<div class="col-4 p0">
-									<img src="<?php echo $thumbnail_url;?>" class="img-responsive">
-							</div>
-							<div class="col-8 left">
-								<p>
-									<span class="font-weight-400 left"><?php the_title();?></span>
-									<span class="badge"><?php get_the_author_meta( 'display_name' )?esc_html_e(get_the_author_meta( 'display_name' )):esc_html_e(get_the_author_meta( 'login' )); ?>  wrote on <?php the_time('d/m/Y');?></span>
-								</p>
-								<p>									
-									<?php the_excerpt();?>
-								</p>
-							</div>
-						</div>
-					<?php };?>
-				</div>
-			<?php };?>
+			
+			<?php				
+				get_template_part( 'template-parts/content', 'related' );				
+			?>
             <div class="promo-box outline-color-1 rounded center w-100">
-                    <div class="row d-flex align-items-center">
-                        <div class="col-md-6">
-                            <p class="display-6">Join our newsletter to get free updates</p>
-                        </div>
-                        <form class="col-md-6 row">
-                            <div class="col-sm-12 col-md-7 ">
-    
-                                <input type="email" class="form-control w-100 m0" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-    
-                            </div>
-                            <div class="col-sm-12 col-md-5 ">
-                                <button type="submit" class="btn btn-primary w-100 m0">Join</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+				<div class="row d-flex align-items-center">
+					<div class="col-md-6">
+						<p class="display-6">Join our newsletter to get free updates</p>
+					</div>
+					<form class="col-md-6 row">
+						<div class="col-sm-12 col-md-7 ">
+
+							<input type="email" class="form-control w-100 m0" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+
+						</div>
+						<div class="col-sm-12 col-md-5 ">
+							<button type="submit" class="btn btn-primary w-100 m0">Join</button>
+						</div>
+					</form>
+				</div>
+			</div>
+			<?php $post=$current;?>
 			<?php if( comments_open() ){?>
 				<?php comments_template(); ?> 
 			<?php };?> 
         </aside>
-
     </main>
 <?php
 }
